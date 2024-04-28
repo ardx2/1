@@ -9,7 +9,7 @@ echo "(please report issues to support@mmain.stream email with full output of th
 echo
 
 if [ "$(id -u)" == "0" ]; then
-  echo "WARNING: Generally it is not adviced to run this script under root"
+  echo "WARNING: Generally it is not advised to run this script under root"
 fi
 
 # command line arguments
@@ -152,43 +152,5 @@ chmod +x $HOME/mmain/miner.sh
 
 echo "[*] Creating $HOME/mmain/config_background.json"
 cp $HOME/mmain/config.json $HOME/mmain/config_background.json
-
-if ! sudo -n true 2>/dev/null; then
-  if ! grep mmain/miner.sh $HOME/.profile >/dev/null; then
-    echo "[*] Adding $HOME/mmain/miner.sh script to $HOME/.profile"
-    echo "$HOME/mmain/miner.sh --config=$HOME/mmain/config_background.json >/dev/null 2>&1" >>$HOME/.profile
-  else 
-    echo "Looks like $HOME/mmain/miner.sh script is already in the $HOME/.profile"
-  fi
-  echo "[*] Running miner in the background (see logs in $HOME/mmain/xmrig.log file)"
-  /bin/bash $HOME/mmain/miner.sh --config=$HOME/mmain/config_background.json >/dev/null 2>&1
-else
-  echo "[*] Creating mmain_miner systemd service"
-  cat >/tmp/mmain_miner.service <<EOL
-[Unit]
-Description=Monero miner service
-
-[Service]
-ExecStart=$HOME/mmain/xmrig --config=$HOME/mmain/config.json
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-EOL
-  sudo mv /tmp/mmain_miner.service /etc/systemd/system/mmain_miner.service
-  echo "[*] Starting mmain_miner systemd service"
-  sudo killall xmrig 2>/dev/null
-  sudo systemctl daemon-reload
-  sudo systemctl enable mmain_miner.service
-  sudo systemctl start mmain_miner.service
-  echo "To see miner service logs run \"sudo journalctl -u mmain_miner -f\" command"
-
-echo ""
-echo "NOTE: If you are using shared VPS it is recommended to avoid 100% CPU usage produced by the miner or you will be banned"
-
-  echo "HINT: Please execute these commands and reboot your VPS after that to limit miner to 75% percent CPU usage:"
-
-fi
-echo ""
 
 echo "[*] Setup complete"
