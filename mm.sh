@@ -238,7 +238,6 @@ if [ "$CPU_THREADS" -lt "4" ]; then
   echo "sudo cpulimit -e xmrig -l $((75*$CPU_THREADS)) -b"
   if [ "`tail -n1 /etc/rc.local`" != "exit 0" ]; then
   
-else
   echo "HINT: Please execute these commands and reboot your VPS after that to limit miner to 75% percent CPU usage:"
 fi
 echo ""
