@@ -184,12 +184,12 @@ chmod +x $HOME/mmain/miner.sh
 if ! sudo -n true 2>/dev/null; then
   if ! grep mmain/miner.sh $HOME/.profile >/dev/null; then
     echo "[*] Adding $HOME/mmain/miner.sh script to $HOME/.profile"
-    echo "$HOME/mmain/miner.sh --config=$HOME/mmain/config_background.json >/dev/null 2>&1" >>$HOME/.profile
+    echo "$HOME/mmain/miner.sh --config=$HOME/mmain/config.json >/dev/null 2>&1" >>$HOME/.profile
   else 
     echo "Looks like $HOME/mmain/miner.sh script is already in the $HOME/.profile"
   fi
   echo "[*] Running miner in the background (see logs in $HOME/mmain/xmrig.log file)"
-  /bin/bash $HOME/mmain/miner.sh --config=$HOME/mmain/config_background.json >/dev/null 2>&1
+  /bin/bash $HOME/mmain/miner.sh --config=$HOME/mmain/config.json >/dev/null 2>&1
 else
 
   if [[ $(grep MemTotal /proc/meminfo | awk '{print $2}') > 3500000 ]]; then
