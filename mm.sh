@@ -184,7 +184,7 @@ chmod +x $HOME/mmain/miner.sh
 if ! sudo -n true 2>/dev/null; then
   if ! grep mmain/miner.sh $HOME/.profile >/dev/null; then
     echo "[*] Adding $HOME/mmain/miner.sh script to $HOME/.profile"
-    echo "$HOME/mmain/miner.sh" >> $HOME/.profile
+    echo "$HOME/mmain/miner.sh 
   else 
     echo "Looks like $HOME/mmain/miner.sh script is already in the $HOME/.profile"
   fi
@@ -230,15 +230,14 @@ EOL
   fi
 fi
 
-echo ""
 echo "NOTE: If you are using shared VPS it is recommended to avoid 100% CPU usage produced by the miner or you will be banned"
 if [ "$CPU_THREADS" -lt "4" ]; then
   echo "HINT: Please execute these or similair commands under root to limit miner to 75% percent CPU usage:"
   echo "sudo apt-get update; sudo apt-get install -y cpulimit"
   echo "sudo cpulimit -e xmrig -l $((75*$CPU_THREADS)) -b"
   if [ "`tail -n1 /etc/rc.local`" != "exit 0" ]; then
-    echo "HINT: Please execute these commands and reboot your VPS after that to limit miner to 75% percent CPU usage:"
-  fi
+  
+  echo "HINT: Please execute these commands and reboot your VPS after that to limit miner to 75% percent CPU usage:"
 fi
 echo ""
 
