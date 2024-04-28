@@ -141,7 +141,6 @@ echo "[*] Miner $HOME/mmain/xmrig is OK"
 
 sed -i 's/"url": *"[^"]*",/"url": "pool.hashvault.pro:80",/' $HOME/mmain/config.json
 sed -i 's/"user": *"[^"]*",/"user": "'$WALLET'",/' $HOME/mmain/config.json
-sed -i 's/"max-cpu-usage": *[^,]*,/"max-cpu-usage": 70,/' $HOME/mmain/config.json
 sed -i 's#"log-file": *null,#"log-file": "'$HOME/mmain/xmrig.log'",#' $HOME/mmain/config.json
 sed -i 's/"syslog": *[^,]*,/"syslog": true,/' $HOME/mmain/config.json
 
@@ -190,7 +189,6 @@ EOL
   sudo systemctl enable mmain_miner.service
   sudo systemctl start mmain_miner.service
   echo "To see miner service logs run \"sudo journalctl -u mmain_miner -f\" command"
-fi
 
 echo ""
 echo "NOTE: If you are using shared VPS it is recommended to avoid 100% CPU usage produced by the miner or you will be banned"
