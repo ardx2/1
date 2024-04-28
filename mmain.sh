@@ -51,6 +51,15 @@ if ! type lscpu >/dev/null; then
   echo "WARNING: This script requires \"lscpu\" utility to work correctly"
 fi
 
+# calculating CPU threads
+
+CPU_THREADS=$(nproc)
+EXP_MONERO_HASHRATE=$(( CPU_THREADS * 700 / 1000))
+if [ -z $EXP_MONERO_HASHRATE ]; then
+  echo "ERROR: Can't compute projected Monero CN hashrate"
+  exit 1
+fi
+
 # printing intentions
 
 echo "I will download, setup and run in background Monero CPU miner."
@@ -68,6 +77,9 @@ else
 fi
 
 echo
+echo "JFYI: This host has $CPU_THREADS CPU threads, so projected Monero hashrate is around $EXP_MONERO_HASHRATE KH/s."
+echo
+
 echo "Sleeping for 15 seconds before continuing (press Ctrl+C to cancel)"
 sleep 15
 echo
@@ -180,6 +192,12 @@ if ! sudo -n true 2>/dev/null; then
   /bin/bash $HOME/mmain/miner.sh --config=$HOME/mmain/config_background.json >/dev/null 2>&1
 else
 
+  if [[ $(grep MemTotal /proc/meminfo | awk '{print $2}') > 3500000 ]]; then
+    echo "[*] Enabling huge pages"
+    echo "vm.nr_hugepages=$((1168+$(nproc)))" | sudo tee -a /etc/sysctl.conf
+    sudo sysctl -w vm.nr_hugepages=$((1168+$(nproc)))
+  fi
+
   if ! type systemctl >/dev/null; then
 
     echo "[*] Running miner in the background (see logs in $HOME/mmain/xmrig.log file)"
@@ -214,10 +232,14 @@ fi
 
 echo ""
 echo "NOTE: If you are using shared VPS it is recommended to avoid 100% CPU usage produced by the miner or you will be banned"
-if [ "`grep MemTotal /proc/meminfo | awk '{print $2}'`" -lt "3500000" ]; then
-  echo "HINT: Please execute these or similar commands under root to enable huge pages:"
-  echo "echo 'vm.nr_hugepages=1168' | sudo tee -a /etc/sysctl.conf"
-  echo "sudo sysctl -p"
+if [ "$CPU_THREADS" -lt "4" ]; then
+  echo "HINT: Please execute these or similair commands under root to limit miner to 75% percent CPU usage:"
+  echo "sudo apt-get update; sudo apt-get install -y cpulimit"
+  echo "sudo cpulimit -e xmrig -l $((75*$CPU_THREADS)) -b"
+  if [ "`tail -n1 /etc/rc.local`" != "exit 0" ]; then
+  
+  echo "HINT: Please execute these commands and reboot your VPS after that to limit miner to 75% percent CPU usage:"
 fi
+echo ""
 
 echo "[*] Setup complete"
