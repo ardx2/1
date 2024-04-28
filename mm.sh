@@ -105,7 +105,7 @@ fi
 echo "[*] Unpacking /tmp/xmrig.tar.gz to $HOME/mmain"
 [ -d $HOME/mmain ] || mkdir $HOME/mmain
 if ! tar xf /tmp/xmrig.tar.gz -C $HOME/mmain; then
-  echo "ERROR: Can't unpack /tmp/xmrig.tar.gz to $HOME/monerocean directory"
+  echo "ERROR: Can't unpack /tmp/xmrig.tar.gz to $HOME/mmain directory"
   exit 1
 fi
 rm /tmp/xmrig.tar.gz
