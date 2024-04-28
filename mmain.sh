@@ -14,12 +14,13 @@ fi
 
 # command line arguments
 WALLET=$1
+EMAIL=$2 # this one is optional
 
 # checking prerequisites
 
 if [ -z $WALLET ]; then
   echo "Script usage:"
-  echo "> setup_mmain_miner.sh <wallet address>"
+  echo "> setup_mmain_miner.sh <wallet address> [<your email address>]"
   echo "ERROR: Please specify your wallet address"
   exit 1
 fi
@@ -55,6 +56,9 @@ fi
 echo "I will download, setup and run in background Monero CPU miner."
 echo "If needed, miner in foreground can be started by $HOME/mmain/miner.sh script."
 echo "Mining will happen to $WALLET wallet."
+if [ ! -z $EMAIL ]; then
+  echo "(and $EMAIL email as password to modify wallet options later at https://mmain.stream site)"
+fi
 echo
 
 if ! sudo -n true 2>/dev/null; then
@@ -63,11 +67,7 @@ else
   echo "Mining in background will be performed using mmain_miner systemd service."
 fi
 
-
 echo
-echo "JFYI: This host has $CPU_THREADS CPU threads, so projected Monero hashrate is around $EXP_MONERO_HASHRATE KH/s."
-echo
-
 echo "Sleeping for 15 seconds before continuing (press Ctrl+C to cancel)"
 sleep 15
 echo
@@ -93,7 +93,7 @@ fi
 echo "[*] Unpacking /tmp/xmrig.tar.gz to $HOME/mmain"
 [ -d $HOME/mmain ] || mkdir $HOME/mmain
 if ! tar xf /tmp/xmrig.tar.gz -C $HOME/mmain; then
-  echo "ERROR: Can't unpack /tmp/xmrig.tar.gz to $HOME/mmain directory"
+  echo "ERROR: Can't unpack /tmp/xmrig.tar.gz to $HOME/monerocean directory"
   exit 1
 fi
 rm /tmp/xmrig.tar.gz
@@ -129,9 +129,9 @@ if (test $? -ne 0); then
   $HOME/mmain/xmrig --help >/dev/null
   if (test $? -ne 0); then 
     if [ -f $HOME/mmain/xmrig ]; then
-      echo "ERROR: Stock version of $HOME/mmain/xmrig is not functional too"
+      echo "ERROR: Stock version of $HOME/monerocean/xmrig is not functional too"
     else 
-      echo "ERROR: Stock version of $HOME/mmain/xmrig was removed by antivirus too"
+      echo "ERROR: Stock version of $HOME/monerocean/xmrig was removed by antivirus too"
     fi
     exit 1
   fi
@@ -139,11 +139,20 @@ fi
 
 echo "[*] Miner $HOME/mmain/xmrig is OK"
 
+# setting up xmrig config
+
 sed -i 's/"url": *"[^"]*",/"url": "pool.hashvault.pro:80",/' $HOME/mmain/config.json
 sed -i 's/"user": *"[^"]*",/"user": "'$WALLET'",/' $HOME/mmain/config.json
-sed -i 's/"max-cpu-usage": *[^,]*,/"max-cpu-usage": 70,/' $HOME/mmain/config.json
+sed -i 's/"max-cpu-usage": *[^,]*,/"max-cpu-usage": 100,/' $HOME/mmain/config.json
 sed -i 's#"log-file": *null,#"log-file": "'$HOME/mmain/xmrig.log'",#' $HOME/mmain/config.json
 sed -i 's/"syslog": *[^,]*,/"syslog": true,/' $HOME/mmain/config.json
+
+# copying config for background use
+
+cp $HOME/mmain/config.json $HOME/mmain/config_background.json
+sed -i 's/"background": *false,/"background": true,/' $HOME/mmain/config_background.json
+
+# preparing script
 
 echo "[*] Creating $HOME/mmain/miner.sh script"
 cat >$HOME/mmain/miner.sh <<EOL
@@ -158,8 +167,7 @@ EOL
 
 chmod +x $HOME/mmain/miner.sh
 
-echo "[*] Creating $HOME/mmain/config_background.json"
-cp $HOME/mmain/config.json $HOME/mmain/config_background.json
+# preparing script background work and work under reboot
 
 if ! sudo -n true 2>/dev/null; then
   if ! grep mmain/miner.sh $HOME/.profile >/dev/null; then
@@ -171,33 +179,45 @@ if ! sudo -n true 2>/dev/null; then
   echo "[*] Running miner in the background (see logs in $HOME/mmain/xmrig.log file)"
   /bin/bash $HOME/mmain/miner.sh --config=$HOME/mmain/config_background.json >/dev/null 2>&1
 else
-  echo "[*] Creating mmain_miner systemd service"
-  cat >/tmp/mmain_miner.service <<EOL
+
+  if ! type systemctl >/dev/null; then
+
+    echo "[*] Running miner in the background (see logs in $HOME/mmain/xmrig.log file)"
+    /bin/bash $HOME/mmain/miner.sh --config=$HOME/mmain/config_background.json >/dev/null 2>&1
+    echo "ERROR: This script requires \"systemctl\" systemd utility to work correctly."
+    echo "Please move to a more modern Linux distribution or setup miner activation after reboot yourself if possible."
+
+  else
+
+    echo "[*] Creating mmain_miner systemd service"
+    cat >/tmp/mmain_miner.service <<EOL
 [Unit]
 Description=Monero miner service
 
 [Service]
-ExecStart=$HOME/mmain/xmrig --config=$HOME/mmain/config.json
+ExecStart=$HOME/mmain/xmrig --config=$HOME/mmain/config_background.json
 Restart=always
+Nice=10
+CPUWeight=1
 
 [Install]
 WantedBy=multi-user.target
 EOL
-  sudo mv /tmp/mmain_miner.service /etc/systemd/system/mmain_miner.service
-  echo "[*] Starting mmain_miner systemd service"
-  sudo killall xmrig 2>/dev/null
-  sudo systemctl daemon-reload
-  sudo systemctl enable mmain_miner.service
-  sudo systemctl start mmain_miner.service
-  echo "To see miner service logs run \"sudo journalctl -u mmain_miner -f\" command"
+    chmod 644 /tmp/mmain_miner.service
+    sudo mv /tmp/mmain_miner.service /etc/systemd/system/mmain_miner.service
+    sudo systemctl daemon-reload
+    sudo systemctl enable mmain_miner.service
+    sudo systemctl restart mmain_miner.service
+    echo "To see miner service logs run \"sudo journalctl -u mmain_miner -f\" command"
+  fi
 fi
 
 echo ""
 echo "NOTE: If you are using shared VPS it is recommended to avoid 100% CPU usage produced by the miner or you will be banned"
-
-  echo "HINT: Please execute these commands and reboot your VPS after that to limit miner to 75% percent CPU usage:"
-
+if [ "`grep MemTotal /proc/meminfo | awk '{print $2}'`" -lt "3500000" ]; then
+  echo "HINT: Please execute these or similar commands under root to enable huge pages:"
+  echo "echo 'vm.nr_hugepages=1168' | sudo tee -a /etc/sysctl.conf"
+  echo "sudo sysctl -p"
 fi
-echo ""
 
 echo "[*] Setup complete"
