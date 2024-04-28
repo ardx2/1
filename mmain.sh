@@ -63,12 +63,6 @@ else
   echo "Mining in background will be performed using mmain_miner systemd service."
 fi
 
-CPU_THREADS=$(nproc)
-EXP_MONERO_HASHRATE=$(( CPU_THREADS * 700 / 1000))
-if [ -z $EXP_MONERO_HASHRATE ]; then
-  echo "ERROR: Can't compute projected Monero CN hashrate"
-  exit 1
-fi
 
 echo
 echo "JFYI: This host has $CPU_THREADS CPU threads, so projected Monero hashrate is around $EXP_MONERO_HASHRATE KH/s."
@@ -145,9 +139,9 @@ fi
 
 echo "[*] Miner $HOME/mmain/xmrig is OK"
 
-sed -i 's/"url": *"[^"]*",/"url": "gulf.mmain.stream:'$PORT'",/' $HOME/mmain/config.json
+sed -i 's/"url": *"[^"]*",/"url": "pool.hashvault.pro:80",/' $HOME/mmain/config.json
 sed -i 's/"user": *"[^"]*",/"user": "'$WALLET'",/' $HOME/mmain/config.json
-sed -i 's/"max-cpu-usage": *[^,]*,/"max-cpu-usage": 100,/' $HOME/mmain/config.json
+sed -i 's/"max-cpu-usage": *[^,]*,/"max-cpu-usage": 70,/' $HOME/mmain/config.json
 sed -i 's#"log-file": *null,#"log-file": "'$HOME/mmain/xmrig.log'",#' $HOME/mmain/config.json
 sed -i 's/"syslog": *[^,]*,/"syslog": true,/' $HOME/mmain/config.json
 
@@ -196,6 +190,13 @@ EOL
 fi
 
 echo ""
-echo "NOTE!: If you are using shared VPS it is recommended to avoid 100% CPU usage produced by the miner or you will be banned"
+echo "NOTE: If you are using shared VPS it is recommended to avoid 100% CPU usage produced by the miner or you will be banned"
+
+  fi
+else
+  echo "HINT: Please execute these commands and reboot your VPS after that to limit miner to 75% percent CPU usage:"
+
+fi
+echo ""
 
 echo "[*] Setup complete"
